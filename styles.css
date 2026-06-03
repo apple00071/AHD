@@ -139,7 +139,7 @@ html, body {
 }
 
 .brand-logo-img {
-  height: 220px;
+  height: clamp(100px, 16vw, 220px);
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
@@ -427,6 +427,20 @@ html, body {
 
 .preview-card:hover .preview-name {
   color: var(--color-gold-light);
+}
+
+.preview-desc {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 0.4rem;
+  transition: var(--transition-smooth);
+  position: relative;
+  z-index: 1;
+}
+
+.preview-card:hover .preview-desc {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Card Footer Section */

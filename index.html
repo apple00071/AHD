@@ -383,11 +383,15 @@
             </p>
           </div>
 
-          <form class="newsletter-form" id="newsletter-form" novalidate>
+          <form class="newsletter-form" id="newsletter-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
+            <input type="hidden" name="access_key" value="cfb9a49a-fb96-405c-8472-e48b5ab57229">
+            <input type="hidden" name="subject" value="New Subscriber - Apple Home Decors">
+            <input type="hidden" name="from_name" value="Apple Home Decors Website">
             <div class="input-group">
               <i class="fa-regular fa-envelope input-icon"></i>
               <input 
                 type="email" 
+                name="email"
                 class="newsletter-input" 
                 id="subscribe-email" 
                 placeholder="Enter your email address..." 

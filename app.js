@@ -51,26 +51,50 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Simulate asynchronous registration
+      // Submit to Web3Forms API
       setLoadingState(true);
 
-      setTimeout(() => {
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: 'cfb9a49a-fb96-405c-8472-e48b5ab57229',
+          email: emailValue,
+          subject: 'New Launch Subscriber - Apple Home Decors',
+          from_name: 'Apple Home Decors Website'
+        })
+      })
+      .then(async (response) => {
+        const json = await response.json();
         setLoadingState(false);
-        feedbackEl.classList.add('success');
-        feedbackEl.innerText = "✨ Thank you! You've been registered for launch updates.";
 
-        // Reset input
-        emailInput.value = '';
+        if (response.status === 200 && json.success) {
+          feedbackEl.className = 'form-feedback success';
+          feedbackEl.innerText = "✨ Thank you! You've been registered for launch updates.";
+          emailInput.value = '';
 
-        // Form border pulse
-        const inputGroup = form.querySelector('.input-group');
-        if (inputGroup) {
-          inputGroup.style.borderColor = '#059669';
-          setTimeout(() => {
-            inputGroup.style.borderColor = '';
-          }, 3500);
+          const inputGroup = form.querySelector('.input-group');
+          if (inputGroup) {
+            inputGroup.style.borderColor = '#059669';
+            setTimeout(() => {
+              inputGroup.style.borderColor = '';
+            }, 4000);
+          }
+        } else {
+          feedbackEl.className = 'form-feedback error';
+          feedbackEl.innerText = json.message || 'Something went wrong. Please try again.';
+          triggerShake(form);
         }
-      }, 1000);
+      })
+      .catch(() => {
+        setLoadingState(false);
+        feedbackEl.className = 'form-feedback error';
+        feedbackEl.innerText = 'Unable to connect. Please check your network and try again.';
+        triggerShake(form);
+      });
     });
   }
 

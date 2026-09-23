@@ -1,7 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // ==========================================
-  // 1. NEWSLETTER FORM VALIDATION & SIGNUP
+  // 1. STICKY HEADER SCROLL EFFECT
+  // ==========================================
+  const header = document.getElementById('site-header');
+  if (header) {
+    const handleScroll = () => {
+      if (window.scrollY > 30) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+  }
+
+  // ==========================================
+  // 2. LAUNCH NEWSLETTER FORM & VALIDATION
   // ==========================================
   const form = document.getElementById('newsletter-form');
   const emailInput = document.getElementById('subscribe-email');
@@ -11,93 +27,102 @@ document.addEventListener('DOMContentLoaded', () => {
   if (form && emailInput && feedbackEl && submitBtn) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const emailValue = emailInput.value.trim();
-      feedbackEl.className = 'form-message'; // Reset classes
+      feedbackEl.className = 'form-feedback';
       feedbackEl.innerText = '';
-      
-      // Simple regex for basic email verification
+
+      // RFC-compliant email regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      
+
       if (!emailValue) {
         feedbackEl.classList.add('error');
         feedbackEl.innerText = 'Please enter your email address.';
         triggerShake(form);
+        emailInput.focus();
         return;
       }
-      
+
       if (!emailRegex.test(emailValue)) {
         feedbackEl.classList.add('error');
         feedbackEl.innerText = 'Please enter a valid email address.';
         triggerShake(form);
+        emailInput.focus();
         return;
       }
-      
-      // Simulate network request (visual premium feedback)
+
+      // Simulate asynchronous registration
       setLoadingState(true);
-      
+
       setTimeout(() => {
         setLoadingState(false);
         feedbackEl.classList.add('success');
-        feedbackEl.innerText = "Thank you! You've been registered for exclusive previews.";
-        
-        // Clear input field
+        feedbackEl.innerText = "✨ Thank you! You've been registered for launch updates.";
+
+        // Reset input
         emailInput.value = '';
-        
-        // Add a nice visual success pulse to form
-        form.style.borderColor = '#10b981';
-        setTimeout(() => {
-          form.style.borderColor = '';
-        }, 3000);
-        
-      }, 1500);
+
+        // Form border pulse
+        const inputGroup = form.querySelector('.input-group');
+        if (inputGroup) {
+          inputGroup.style.borderColor = '#059669';
+          setTimeout(() => {
+            inputGroup.style.borderColor = '';
+          }, 3500);
+        }
+      }, 1000);
     });
   }
 
-  // UI state management helper
   function setLoadingState(isLoading) {
     if (isLoading) {
       emailInput.disabled = true;
       submitBtn.disabled = true;
-      submitBtn.style.opacity = '0.7';
-      submitBtn.querySelector('span').innerText = 'Sending...';
-      submitBtn.querySelector('i').className = 'fa-solid fa-spinner fa-spin';
+      submitBtn.style.opacity = '0.75';
+      submitBtn.querySelector('span').innerText = 'Subscribing...';
+      const icon = submitBtn.querySelector('i');
+      if (icon) icon.className = 'fa-solid fa-circle-notch fa-spin';
     } else {
       emailInput.disabled = false;
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
       submitBtn.querySelector('span').innerText = 'Notify Me';
-      submitBtn.querySelector('i').className = 'fa-solid fa-arrow-right';
+      const icon = submitBtn.querySelector('i');
+      if (icon) icon.className = 'fa-solid fa-arrow-right';
     }
   }
 
-  // Subtle error animation: shakes the form container
   function triggerShake(element) {
-    element.style.transform = 'translateX(-10px)';
-    setTimeout(() => { element.style.transform = 'translateX(10px)'; }, 100);
-    setTimeout(() => { element.style.transform = 'translateX(-6px)'; }, 200);
-    setTimeout(() => { element.style.transform = 'translateX(6px)'; }, 300);
-    setTimeout(() => { element.style.transform = 'translateX(0)'; }, 400);
+    const inputGroup = element.querySelector('.input-group') || element;
+    inputGroup.style.transition = 'transform 0.08s ease';
+    inputGroup.style.transform = 'translateX(-8px)';
+    setTimeout(() => { inputGroup.style.transform = 'translateX(8px)'; }, 80);
+    setTimeout(() => { inputGroup.style.transform = 'translateX(-5px)'; }, 160);
+    setTimeout(() => { inputGroup.style.transform = 'translateX(5px)'; }, 240);
+    setTimeout(() => { inputGroup.style.transform = 'translateX(0)'; }, 320);
   }
 
   // ==========================================
-  // 3. OPTIONAL HOVER EFFECT FOR SERVICES CARDS
+  // 3. SMOOTH SCROLLING FOR NAV ANCHORS
   // ==========================================
-  const cards = document.querySelectorAll('.preview-card');
-  cards.forEach(card => {
-    card.addEventListener('mouseenter', () => {
-      const icon = card.querySelector('.preview-icon i');
-      if (icon) {
-        icon.style.transform = 'scale(1.2) rotate(5deg)';
-        icon.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-      }
-    });
-    
-    card.addEventListener('mouseleave', () => {
-      const icon = card.querySelector('.preview-icon i');
-      if (icon) {
-        icon.style.transform = 'scale(1) rotate(0deg)';
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+
+      const targetEl = document.querySelector(targetId);
+      if (targetEl) {
+        e.preventDefault();
+        const headerOffset = 80;
+        const elementPosition = targetEl.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     });
   });
+
 });

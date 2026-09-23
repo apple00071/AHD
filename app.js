@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 2. LAUNCH NEWSLETTER FORM & VALIDATION
+  // 2. LAUNCH NEWSLETTER FORM & WEB3FORMS SUBMISSION
   // ==========================================
   const form = document.getElementById('newsletter-form');
   const emailInput = document.getElementById('subscribe-email');
@@ -51,7 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Submit to Web3Forms API
+      // Prepare payload per Web3Forms standard
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData);
+      payload.email = emailValue;
+      payload.access_key = 'cfb9a49a-fb96-405c-8472-e48b5ab57229';
+      payload.subject = 'New Launch Subscriber - Apple Home Decors';
+      payload.from_name = 'Apple Home Decors Website';
+
       setLoadingState(true);
 
       fetch('https://api.web3forms.com/submit', {
@@ -60,16 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          access_key: 'cfb9a49a-fb96-405c-8472-e48b5ab57229',
-          email: emailValue,
-          subject: 'New Launch Subscriber - Apple Home Decors',
-          from_name: 'Apple Home Decors Website'
-        })
+        body: JSON.stringify(payload)
       })
       .then(async (response) => {
         const json = await response.json();
         setLoadingState(false);
+        console.log('Web3Forms response:', json);
 
         if (response.status === 200 && json.success) {
           feedbackEl.className = 'form-feedback success';
@@ -85,14 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else {
           feedbackEl.className = 'form-feedback error';
-          feedbackEl.innerText = json.message || 'Something went wrong. Please try again.';
+          feedbackEl.innerText = json.message || 'Submission failed. Please try again.';
           triggerShake(form);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Web3Forms error:', err);
         setLoadingState(false);
         feedbackEl.className = 'form-feedback error';
-        feedbackEl.innerText = 'Unable to connect. Please check your network and try again.';
+        feedbackEl.innerText = 'Network error. Please try again.';
         triggerShake(form);
       });
     });
